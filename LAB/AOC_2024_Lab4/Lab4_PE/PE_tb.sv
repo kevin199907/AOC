@@ -1,8 +1,8 @@
 `timescale 1ns/10ps
 `define CYCLE 10.0
 `include "PE.sv"  // change to "PE.v" , if you implent by verilog
-`define PATH "/home/.../Lab4_PE/"  //change to your own path
-`define MAX 100 // adjust the cycle you need 
+`define PATH "./../"  //change to your own path
+`define MAX 100000 // adjust the cycle you need 
 `include "def.svh"
 // PE tb final version
 
