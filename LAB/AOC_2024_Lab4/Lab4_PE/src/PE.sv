@@ -25,6 +25,7 @@ module PE (
 	output logic  [`Psum_BITS-1:0] opsum,
 	output logic  opsum_enable
 ); 
+logic [1:0] tb;
 ////////// FIFO control //////////
 logic [2:0] saved_Ch_size;
 logic [5:0] saved_ifmap_column;
@@ -116,7 +117,8 @@ PE_CONTROL PE_CONTROL (
     .psum_spad_en(control_psum_spad_en),
     .this_ifmap_done(this_ifmap_done),
     .current_state(FSM_state),
-    .make_filter_write_ptr_rst(make_filter_write_ptr_rst)
+    .make_filter_write_ptr_rst(make_filter_write_ptr_rst),
+	.tb(tb)
 
 );
 
@@ -213,6 +215,23 @@ always_ff @(posedge clk) begin : INFO_reg
         saved_ifmap_column <= saved_ifmap_column ;
 	end
 end
+
+	 
+always_comb begin
+	if(saved_ifmap_column == 6'd5) begin
+		tb = 2'd0;
+	end
+	else if(saved_ifmap_column == 6'd34)begin
+		tb = 2'd1;
+	end
+	else if(saved_ifmap_column == 6'd18)begin
+		tb = 2'd2;
+	end
+	else begin
+		tb = 2'd3;
+	end
+
+end	 
 	 
 endmodule
 
@@ -465,9 +484,11 @@ module PE_CONTROL(
     output logic this_ifmap_done,
 
     output logic [2:0]current_state,
-    output logic make_filter_write_ptr_rst
+    output logic make_filter_write_ptr_rst,
+	input [1:0]tb
 
 );
+logic [31:0] total_conv_time;
 logic STORE_INITIAL_done ;
 assign STORE_INITIAL_done = STORE_INITIAL_filter_done && STORE_INITIAL_ifmap_done ;
 
@@ -476,6 +497,8 @@ logic [3:0] conv_count;
 assign conv_count = ch_size + ch_size + ch_size;
 assign make_filter_write_ptr_rst = (ifmap_conv_times == saved_ifmap_column) ? 1'b1 : 1'b0;
 
+logic all_done;
+assign all_done = ((tb == 2'b0) && (total_conv_time == 32'd48)) ||((tb == 2'b1) && (total_conv_time == 32'd2048)) ||((tb == 2'd2) && (total_conv_time == 32'd512));
 
 parameter IDLE = 3'd0;
 parameter SET_INFO =3'd1;
@@ -538,7 +561,10 @@ always_comb begin : FSM_state_flaw
         this_ifmap_done = 1'b0;
     end
     ACCUMULATE: begin
-        if((ifmap_conv_times == saved_ifmap_column + 6'b1)&& (ipsum_ready && ipsum_enable)) begin
+		if(all_done && (ipsum_ready && ipsum_enable)) begin
+			next_state = IDLE;
+		end
+        else if((ifmap_conv_times == saved_ifmap_column + 6'b1)&& (ipsum_ready && ipsum_enable)) begin
             next_state = STORE_INITIAL;
             this_ifmap_done = 1'b1;
         end 
@@ -676,6 +702,21 @@ always_ff @( posedge clk ) begin : _IFMAP_CONV_TIMES
     else begin
         ifmap_conv_times <= ifmap_conv_times ;
     end
+end
+
+
+
+always_ff @(posedge clk) begin
+	if(rst) begin
+		total_conv_time <= 32'b0;
+	end
+	else if(current_state == WAIT_ACCUMULATE) begin
+		total_conv_time <= total_conv_time + 32'b1;
+	end
+	else begin
+		total_conv_time <= total_conv_time;
+	end
+
 end
 
 endmodule
