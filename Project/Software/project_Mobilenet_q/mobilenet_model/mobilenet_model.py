@@ -34,7 +34,7 @@ class h_sigmoid(nn.Module):
     def __init__(self, inplace=True):
         super(h_sigmoid, self).__init__()
         self.relu = nn.ReLU6(inplace=inplace)
-
+        
     def forward(self, x):
         return self.relu(x + 3) / 6
 
@@ -94,18 +94,22 @@ class MobileNetV3_block(nn.Module):
         self.hs4 = h_swish()
     
     def forward(self,x):
-        out = self.pw1(x)
-        out = self.bn1(out)
-        out = self.hs1(out)
-        out = self.dw1(out)
-        out = self.bn2(out)
-        out = self.hs2(out)
-        out = self.se1(out)
-        out = self.hs3(out)
-        out = self.pw2(out)
-        out = self.bn3(out)
-        out = self.hs4(out)
-        return out
+
+        out1 = self.pw1(x)
+        out2 = self.bn1(out1)
+        out3 = self.hs1(out2)
+        out4 = self.dw1(out3)
+        out5 = self.bn2(out4)
+        out6 = self.hs2(out5)
+        out7 = self.se1(out6)
+        out8 = self.hs3(out7)
+        out9 = self.pw2(out8)
+        out10 = self.bn3(out9)
+        out11 = self.hs4(out10)
+        self.input_pw_bn1_out = out2
+        #breakpoint()
+        return out11
+        
 
 class Our_MobileNetV3(nn.Module):
     def __init__(self):
@@ -125,19 +129,20 @@ class Our_MobileNetV3(nn.Module):
 
     
     def forward(self,x):
-        out = self.conv1(x)
-        out = self.block1(out)
-        out = self.block2(out)
-        out = self.block3(out)
-        out = self.block4(out)
-        out = self.block5(out)
-        out = self.block6(out)
-        out = self.block7(out)
-        out = self.avgpool(out)
+        out1 = self.conv1(x)
+        out2 = self.block1(out1)
+        out3 = self.block2(out2)
+        out4 = self.block3(out3)
+        out5 = self.block4(out4)
+        out6 = self.block5(out5)
+        out7 = self.block6(out6)
+        out8 = self.block7(out7)
+        out = self.avgpool(out8)
         out = out.view(out.size(0),-1)
         out = self.linear1(out)
         out = self.swish(out)
         out = self.linear2(out)
+        #breakpoint()
         return out
 ########################################
 class Our_MobileNetV3_have_bias(nn.Module):
@@ -180,27 +185,31 @@ class BN_fold_MobileNetV3_block(nn.Module):
         super(BN_fold_MobileNetV3_block, self).__init__()
 
         ############ My Design #########
-        #self.pw1 = pw_conv(infp,middle_feature)
+
         self.pw1 = nn.Conv2d(in_channels=infp, out_channels=middle_feature, kernel_size=1, stride=1,padding= 0, bias=bias)
         self.hs1 = h_swish()
 
         self.dw1 = nn.Conv2d(middle_feature,middle_feature,kernel_size,stride=stride,padding=padding,groups=middle_feature,bias=bias)
-        #self.dw1 = dw_conv(middle_feature,middle_feature,kernel_size,stride,padding)
+
         self.hs2 = h_swish()
         self.se1 = SELayer(middle_feature)
         self.hs3 = h_swish()
         self.pw2 = nn.Conv2d(in_channels=middle_feature, out_channels=outfp, kernel_size=1, stride=1,padding= 0, bias=bias)
-        #self.pw2 = pw_conv(middle_feature, outfp)
+        self.hs4 = h_swish()
     
     def forward(self,x):
-        out = self.pw1(x)
-        out = self.hs1(out)
-        out = self.dw1(out)
-        out = self.hs2(out)
-        out = self.se1(out)
-        out = self.hs3(out)
-        out = self.pw2(out)
-        return out
+        
+        out1 = self.pw1(x)
+        out2 = self.hs1(out1)
+        out3 = self.dw1(out2)
+        out4 = self.hs2(out3)
+        out5 = self.se1(out4)
+        out6 = self.hs3(out5)
+        out7 = self.pw2(out6)
+        out8 = self.hs4(out7)
+        self.bn_fold_pw1_out = out1
+        #breakpoint()
+        return out8
 
   
 class BN_fold_Our_MobileNetV3(nn.Module):
@@ -221,17 +230,18 @@ class BN_fold_Our_MobileNetV3(nn.Module):
 
     
     def forward(self,x):
-        out = self.conv1(x)
-        out = self.block1(out)
-        out = self.block2(out)
-        out = self.block3(out)
-        out = self.block4(out)
-        out = self.block5(out)
-        out = self.block6(out)
-        out = self.block7(out)
-        out = self.avgpool(out)
+        out1 = self.conv1(x)
+        out2 = self.block1(out1)
+        out3 = self.block2(out2)
+        out4 = self.block3(out3)
+        out5 = self.block4(out4)
+        out6 = self.block5(out5)
+        out7 = self.block6(out6)
+        out8 = self.block7(out7)
+        out = self.avgpool(out8)
         out = out.view(out.size(0),-1)
         out = self.linear1(out)
         out = self.swish(out)
         out = self.linear2(out)
+       # breakpoint()
         return out
