@@ -53,10 +53,10 @@ class SELayer(nn.Module):
         super(SELayer, self).__init__()
         self.avg_pool = nn.AdaptiveAvgPool2d(1)
         self.fc = nn.Sequential(
-                nn.Linear(channel, _make_divisible(channel // reduction, 8)),
+                nn.Linear(channel, _make_divisible(channel // reduction, 8),bias=False),
                 nn.ReLU(inplace=True),
-                nn.Linear(_make_divisible(channel // reduction, 8), channel),
-                h_sigmoid()
+                nn.Linear(_make_divisible(channel // reduction, 8), channel,bias=False),
+                nn.ReLU(inplace=True)
         )
 
     def forward(self, x):
@@ -88,7 +88,6 @@ class MobileNetV3_block(nn.Module):
         self.bn2 = nn.BatchNorm2d(middle_feature)
         self.hs2 = h_swish()
         self.se1 = SELayer(middle_feature)
-        self.hs3 = h_swish()
         self.pw2 = nn.Conv2d(in_channels=middle_feature, out_channels=outfp, kernel_size=1, stride=1,padding= 0, bias=bias)
         self.bn3 = nn.BatchNorm2d( outfp)
         self.hs4 = h_swish()
@@ -102,8 +101,7 @@ class MobileNetV3_block(nn.Module):
         out5 = self.bn2(out4)
         out6 = self.hs2(out5)
         out7 = self.se1(out6)
-        out8 = self.hs3(out7)
-        out9 = self.pw2(out8)
+        out9 = self.pw2(out7)
         out10 = self.bn3(out9)
         out11 = self.hs4(out10)
         self.input_pw_bn1_out = out2
@@ -114,7 +112,7 @@ class MobileNetV3_block(nn.Module):
 class Our_MobileNetV3(nn.Module):
     def __init__(self):
         super(Our_MobileNetV3, self).__init__()
-        self.conv1 = nn.Conv2d(in_channels=1,out_channels=8,kernel_size=3,stride=1,padding=1,bias=False)
+        self.conv1 = nn.Conv2d(in_channels=1,out_channels=8,kernel_size=3,stride=1,padding=1,bias=True)
         self.block1 = MobileNetV3_block(infp = 8, outfp=16 , middle_feature=8 ,kernel_size=3,stride=2,padding=1,bias=False)
         self.block2 = MobileNetV3_block(infp = 16, outfp=32 , middle_feature=48 ,kernel_size=3,stride=2,padding=1,bias=False)
         self.block3 = MobileNetV3_block(infp = 32, outfp=32 , middle_feature=64 ,kernel_size=3,stride=2,padding=1,bias=False)
@@ -123,9 +121,11 @@ class Our_MobileNetV3(nn.Module):
         self.block6 = MobileNetV3_block(infp = 64, outfp=64 , middle_feature=96 ,kernel_size=3,stride=2,padding=1,bias=False)
         self.block7 = MobileNetV3_block(infp = 64, outfp=32 , middle_feature=48 ,kernel_size=3,stride=2,padding=1,bias=False)
         self.avgpool = nn.AdaptiveAvgPool2d(1)
-        self.linear1 = nn.Linear(32,20,bias=False)
-        self.swish = h_swish()
-        self.linear2 = nn.Linear(20,10,bias=False)
+        self.classifier = nn.Sequential(
+            nn.Linear(32,20,bias=False),
+            nn.ReLU(inplace=True),
+            nn.Linear(20,10,bias=False)
+        )
 
     
     def forward(self,x):
@@ -139,9 +139,7 @@ class Our_MobileNetV3(nn.Module):
         out8 = self.block7(out7)
         out = self.avgpool(out8)
         out = out.view(out.size(0),-1)
-        out = self.linear1(out)
-        out = self.swish(out)
-        out = self.linear2(out)
+        out = self.classifier(out)
         #breakpoint()
         return out
 ########################################
@@ -158,7 +156,7 @@ class Our_MobileNetV3_have_bias(nn.Module):
         self.block7 = MobileNetV3_block(infp = 64, outfp=32 , middle_feature=48 ,kernel_size=3,stride=2,padding=1,bias=True)
         self.avgpool = nn.AdaptiveAvgPool2d(1)
         self.linear1 = nn.Linear(32,20,bias=False)
-        self.swish = h_swish()
+        self.ReLU = nn.ReLU(inplace=True)
         self.linear2 = nn.Linear(20,10,bias=False)
 
     
@@ -174,7 +172,7 @@ class Our_MobileNetV3_have_bias(nn.Module):
         out = self.avgpool(out)
         out = out.view(out.size(0),-1)
         out = self.linear1(out)
-        out = self.swish(out)
+        out = self.ReLU(out)
         out = self.linear2(out)
         return out  
 
@@ -193,7 +191,6 @@ class BN_fold_MobileNetV3_block(nn.Module):
 
         self.hs2 = h_swish()
         self.se1 = SELayer(middle_feature)
-        self.hs3 = h_swish()
         self.pw2 = nn.Conv2d(in_channels=middle_feature, out_channels=outfp, kernel_size=1, stride=1,padding= 0, bias=bias)
         self.hs4 = h_swish()
     
@@ -204,8 +201,7 @@ class BN_fold_MobileNetV3_block(nn.Module):
         out3 = self.dw1(out2)
         out4 = self.hs2(out3)
         out5 = self.se1(out4)
-        out6 = self.hs3(out5)
-        out7 = self.pw2(out6)
+        out7 = self.pw2(out5)
         out8 = self.hs4(out7)
         self.bn_fold_pw1_out = out1
         #breakpoint()
@@ -215,7 +211,7 @@ class BN_fold_MobileNetV3_block(nn.Module):
 class BN_fold_Our_MobileNetV3(nn.Module):
     def __init__(self):
         super(BN_fold_Our_MobileNetV3, self).__init__()
-        self.conv1 = nn.Conv2d(in_channels=1,out_channels=8,kernel_size=3,stride=1,padding=1,bias=False)
+        self.conv1 = nn.Conv2d(in_channels=1,out_channels=8,kernel_size=3,stride=1,padding=1,bias=True)
         self.block1 = BN_fold_MobileNetV3_block(infp = 8, outfp=16 , middle_feature=8 ,kernel_size=3,stride=2,padding=1,bias=True)
         self.block2 = BN_fold_MobileNetV3_block(infp = 16, outfp=32 , middle_feature=48 ,kernel_size=3,stride=2,padding=1,bias=True)
         self.block3 = BN_fold_MobileNetV3_block(infp = 32, outfp=32 , middle_feature=64 ,kernel_size=3,stride=2,padding=1,bias=True)
@@ -224,9 +220,12 @@ class BN_fold_Our_MobileNetV3(nn.Module):
         self.block6 = BN_fold_MobileNetV3_block(infp = 64, outfp=64 , middle_feature=96 ,kernel_size=3,stride=2,padding=1,bias=True)
         self.block7 = BN_fold_MobileNetV3_block(infp = 64, outfp=32 , middle_feature=48 ,kernel_size=3,stride=2,padding=1,bias=True)
         self.avgpool = nn.AdaptiveAvgPool2d(1)
-        self.linear1 = nn.Linear(32,20,bias=False)
-        self.swish = h_swish()
-        self.linear2 = nn.Linear(20,10,bias=False)
+        self.classifier = nn.Sequential(
+            nn.Linear(32,20,bias=False),
+            nn.ReLU(inplace=True),
+            nn.Linear(20,10,bias=False)
+        )
+
 
     
     def forward(self,x):
@@ -240,8 +239,7 @@ class BN_fold_Our_MobileNetV3(nn.Module):
         out8 = self.block7(out7)
         out = self.avgpool(out8)
         out = out.view(out.size(0),-1)
-        out = self.linear1(out)
-        out = self.swish(out)
-        out = self.linear2(out)
+        out = self.classifier(out)
+
        # breakpoint()
         return out

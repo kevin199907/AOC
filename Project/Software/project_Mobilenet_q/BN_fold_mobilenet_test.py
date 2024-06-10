@@ -312,9 +312,9 @@ n_valid = 0.2
 # Get indices for training_set and validation_set
 n_train = len(train_data)
 indices = list(range(n_train))
-#np.random.shuffle(indices)
-split = 1
-#split = int(np.floor(n_valid * n_train))
+np.random.shuffle(indices)
+#split = 1
+split = int(np.floor(n_valid * n_train))
 train_idx, valid_idx = indices[split:], indices[:split]
 
 # Define samplers for obtaining training and validation
