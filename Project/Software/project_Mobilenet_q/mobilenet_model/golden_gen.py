@@ -61,6 +61,7 @@ def golden_gen(golden_layer_decimal):
     golden.pop(0)
     for indice,data in enumerate(golden):
         print(*data,sep='')
+    return golden
 
 def input_or_weight_gen(layer_decimal):
     '''Convert a layer output which is signed decimal in GPU to 8 bits hex with 2's complement in CPU and
