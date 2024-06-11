@@ -1,0 +1,2 @@
+vcs -R -sverilog tb_RLE.sv -debug_access+all -full64
+vcs -R -sverilog tb_zigzag.sv -debug_access+all -full64

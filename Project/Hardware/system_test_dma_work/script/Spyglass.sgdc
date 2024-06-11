@@ -1,0 +1,655 @@
+current_design "top"
+
+# define your clock
+clock -name "top.cpu_clk"     -domain cpu_clk     -tag cpu_clk    -period 10.0  -edge {0 5.0}
+clock -name "top.axi_clk"     -domain axi_clk     -tag axi_clk    -period 25.0  -edge {0 12.5}
+clock -name "top.dram_clk"    -domain dram_clk    -tag dram_clk   -period 30.4  -edge {0 15.2}
+clock -name "top.rom_clk"     -domain rom_clk     -tag rom_clk    -period 50.2  -edge {0 25.1}
+clock -name "top.sram_clk"    -domain sram_clk    -tag sram_clk   -period 11.0  -edge {0 5.5}
+
+reset -name "cpu_rst"  -value 1 -async
+reset -name "axi_rst"  -value 1 -async
+reset -name "rom_rst"  -value 1 -async
+reset -name "dram_rst"  -value 1 -async
+reset -name "sram_rst"  -value 1 -async
+
+reset -name "CPU_RSTn"  -value 0 -async
+reset -name "AXI_RSTn"  -value 0 -async
+reset -name "ROM_RSTn"  -value 0 -async
+reset -name "DRAM_RSTn"  -value 0 -async
+reset -name "SRAM_RSTn"  -value 0 -async
+
+# abstract_port -module data_array -ports A0 A1 A2 A3 A4 A5 DO0 DO1 DO2 DO3 DO4 DO5 DO6 DO7 DO8 DO9 DO10 DO11 DO12 DO13 DO14 DO15 DO16 DO17 DO18 DO19 DO20 DO21 DO22 DO23 DO24 DO25 DO26 DO27 DO28 DO29 DO30 DO31 DO32 DO33 DO34 DO35 DO36 DO37 DO38 DO39 DO40 DO41 DO42 DO43 DO44 DO45 DO46 DO47 DO48 DO49 DO50 DO51 DO52 DO53 DO54 DO55 DO56 DO57 DO58 DO59 DO60 DO61 DO62 DO63 DO64 DO65 DO66 DO67 DO68 DO69 DO70 DO71 DO72 DO73 DO74 DO75 DO76 DO77 DO78 DO79 DO80 DO81 DO82 DO83 DO84 DO85 DO86 DO87 DO88 DO89 DO90 DO91 DO92 DO93 DO94 DO95 DO96 DO97 DO98 DO99 DO100 DO101 DO102 DO103 DO104 DO105 DO106 DO107 DO108 DO109 DO110 DO111 DO112 DO113 DO114 DO115 DO116 DO117 DO118 DO119 DO120 DO121 DO122 DO123 DO124 DO125 DO126 DO127 DI0 DI1 DI2 DI3 DI4 DI5 DI6 DI7 DI8 DI9 DI10 DI11 DI12 DI13 DI14 DI15 DI16 DI17 DI18 DI19 DI20 DI21 DI22 DI23 DI24 DI25 DI26 DI27 DI28 DI29 DI30 DI31 DI32 DI33 DI34 DI35 DI36 DI37 DI38 DI39 DI40 DI41 DI42 DI43 DI44 DI45 DI46 DI47 DI48 DI49 DI50 DI51 DI52 DI53 DI54 DI55 DI56 DI57 DI58 DI59 DI60 DI61 DI62 DI63 DI64 DI65 DI66 DI67 DI68 DI69 DI70 DI71 DI72 DI73 DI74 DI75 DI76 DI77 DI78 DI79 DI80 DI81 DI82 DI83 DI84 DI85 DI86 DI87 DI88 DI89 DI90 DI91 DI92 DI93 DI94 DI95 DI96 DI97 DI98 DI99 DI100 DI101 DI102 DI103 DI104 DI105 DI106 DI107 DI108 DI109 DI110 DI111 DI112 DI113 DI114 DI115 DI116 DI117 DI118 DI119 DI120 DI121 DI122 DI123 DI124 DI125 DI126 DI127 WEB0 WEB1 WEB2 WEB3 WEB4 WEB5 WEB6 WEB7 WEB8 WEB9 WEB10 WEB11 WEB12 WEB13 WEB14 WEB15 OE CS -clock cpu_clk
+# abstract_port -module tag_array -ports A0 A1 A2 A3 A4 A5 DO0 DO1 DO2 DO3 DO4 DO5 DO6 DO7 DO8 DO9 DO10 DO11 DO12 DO13 DO14 DO15 DO16 DO17 DO18 DO19 DO20 DO21 DI0 DI1 DI2 DI3 DI4 DI5 DI6 DI7 DI8 DI9 DI10 DI11 DI12 DI13 DI14 DI15 DI16 DI17 DI18 DI19 DI20 DI21 WEB OE CS -clock cpu_clk
+# abstract_port -module SRAM -ports A0 A1 A2 A3 A4 A5 A6 A7 A8 A9 A10 A11 A12 A13 DO0 DO1 DO2 DO3 DO4 DO5 DO6 DO7 DO8 DO9 DO10 DO11 DO12 DO13 DO14 DO15 DO16 DO17 DO18 DO19 DO20 DO21 DO22 DO23 DO24 DO25 DO26 DO27 DO28 DO29 DO30 DO31 DI0 DI1 DI2 DI3 DI4 DI5 DI6 DI7 DI8 DI9 DI10 DI11 DI12 DI13 DI14 DI15 DI16 DI17 DI18 DI19 DI20 DI21 DI22 DI23 DI24 DI25 DI26 DI27 DI28 DI29 DI30 DI31 WEB0 WEB1 WEB2 WEB3 OE CS -clock sram_clk
+
+# ---------------- reset register to 0 ---------------- # 
+# ---------------- axi_m0_cdc ---------------- #
+# AW
+# define_tag -tag initState -name top.AXI.axi_m0_cdc.aw_m2s.wbin 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_m0_cdc.aw_m2s.wptr_wclk     -value 0
+# define_tag -tag initState -name top.AXI.axi_m0_cdc.aw_m2s.wfull 	      -value 0
+# define_tag -tag initState -name top.AXI.axi_m0_cdc.aw_m2s.rbin          -value 0
+# define_tag -tag initState -name top.AXI.axi_m0_cdc.aw_m2s.rptr_rclk     -value 0
+# define_tag -tag initState -name top.AXI.axi_m0_cdc.aw_m2s.rempty        -value 0
+# define_tag -tag initState -name top.AXI.axi_m0_cdc.aw_m2s.f1_rptr       -value 0
+# define_tag -tag initState -name top.AXI.axi_m0_cdc.aw_m2s.rptr_wclk     -value 0
+# define_tag -tag initState -name top.AXI.axi_m0_cdc.aw_m2s.f1_wptr       -value 0
+# define_tag -tag initState -name top.AXI.axi_m0_cdc.aw_m2s.wptr_rclk     -value 0
+
+# W
+# define_tag -tag initState -name top.AXI.axi_m0_cdc.w_m2s.wbin 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_m0_cdc.w_m2s.wptr_wclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_m0_cdc.w_m2s.wfull 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_m0_cdc.w_m2s.rbin           -value 0
+# define_tag -tag initState -name top.AXI.axi_m0_cdc.w_m2s.rptr_rclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_m0_cdc.w_m2s.rempty         -value 0
+# define_tag -tag initState -name top.AXI.axi_m0_cdc.w_m2s.f1_rptr        -value 0
+# define_tag -tag initState -name top.AXI.axi_m0_cdc.w_m2s.rptr_wclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_m0_cdc.w_m2s.f1_wptr        -value 0
+# define_tag -tag initState -name top.AXI.axi_m0_cdc.w_m2s.wptr_rclk      -value 0
+
+# AR 
+# define_tag -tag initState -name top.AXI.axi_m0_cdc.ar_m2s.wbin 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_m0_cdc.ar_m2s.wptr_wclk     -value 0
+# define_tag -tag initState -name top.AXI.axi_m0_cdc.ar_m2s.wfull 	      -value 0
+# define_tag -tag initState -name top.AXI.axi_m0_cdc.ar_m2s.rbin          -value 0
+# define_tag -tag initState -name top.AXI.axi_m0_cdc.ar_m2s.rptr_rclk     -value 0
+# define_tag -tag initState -name top.AXI.axi_m0_cdc.ar_m2s.rempty        -value 0
+# define_tag -tag initState -name top.AXI.axi_m0_cdc.ar_m2s.f1_rptr       -value 0
+# define_tag -tag initState -name top.AXI.axi_m0_cdc.ar_m2s.rptr_wclk     -value 0
+# define_tag -tag initState -name top.AXI.axi_m0_cdc.ar_m2s.f1_wptr       -value 0
+# define_tag -tag initState -name top.AXI.axi_m0_cdc.ar_m2s.wptr_rclk     -value 0
+
+# R
+# define_tag -tag initState -name top.AXI.axi_m0_cdc.r_s2m.wbin 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_m0_cdc.r_s2m.wptr_wclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_m0_cdc.r_s2m.wfull 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_m0_cdc.r_s2m.rbin           -value 0
+# define_tag -tag initState -name top.AXI.axi_m0_cdc.r_s2m.rptr_rclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_m0_cdc.r_s2m.rempty         -value 0
+# define_tag -tag initState -name top.AXI.axi_m0_cdc.r_s2m.f1_rptr        -value 0
+# define_tag -tag initState -name top.AXI.axi_m0_cdc.r_s2m.rptr_wclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_m0_cdc.r_s2m.f1_wptr        -value 0
+# define_tag -tag initState -name top.AXI.axi_m0_cdc.r_s2m.wptr_rclk      -value 0
+
+# B
+# define_tag -tag initState -name top.AXI.axi_m0_cdc.b_s2m.wbin 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_m0_cdc.b_s2m.wptr_wclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_m0_cdc.b_s2m.wfull 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_m0_cdc.b_s2m.rbin           -value 0
+# define_tag -tag initState -name top.AXI.axi_m0_cdc.b_s2m.rptr_rclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_m0_cdc.b_s2m.rempty         -value 0
+# define_tag -tag initState -name top.AXI.axi_m0_cdc.b_s2m.f1_rptr        -value 0
+# define_tag -tag initState -name top.AXI.axi_m0_cdc.b_s2m.rptr_wclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_m0_cdc.b_s2m.f1_wptr        -value 0
+# define_tag -tag initState -name top.AXI.axi_m0_cdc.b_s2m.wptr_rclk      -value 0
+
+
+
+# ---------------- axi_m1_cdc ---------------- #
+# AW
+# define_tag -tag initState -name top.AXI.axi_m1_cdc.aw_m2s.wbin 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_m1_cdc.aw_m2s.wptr_wclk     -value 0
+# define_tag -tag initState -name top.AXI.axi_m1_cdc.aw_m2s.wfull 	      -value 0
+# define_tag -tag initState -name top.AXI.axi_m1_cdc.aw_m2s.rbin          -value 0
+# define_tag -tag initState -name top.AXI.axi_m1_cdc.aw_m2s.rptr_rclk     -value 0
+# define_tag -tag initState -name top.AXI.axi_m1_cdc.aw_m2s.rempty        -value 0
+# define_tag -tag initState -name top.AXI.axi_m1_cdc.aw_m2s.f1_rptr       -value 0
+# define_tag -tag initState -name top.AXI.axi_m1_cdc.aw_m2s.rptr_wclk     -value 0
+# define_tag -tag initState -name top.AXI.axi_m1_cdc.aw_m2s.f1_wptr       -value 0
+# define_tag -tag initState -name top.AXI.axi_m1_cdc.aw_m2s.wptr_rclk     -value 0
+
+# W
+# define_tag -tag initState -name top.AXI.axi_m1_cdc.w_m2s.wbin 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_m1_cdc.w_m2s.wptr_wclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_m1_cdc.w_m2s.wfull 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_m1_cdc.w_m2s.rbin           -value 0
+# define_tag -tag initState -name top.AXI.axi_m1_cdc.w_m2s.rptr_rclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_m1_cdc.w_m2s.rempty         -value 0
+# define_tag -tag initState -name top.AXI.axi_m1_cdc.w_m2s.f1_rptr        -value 0
+# define_tag -tag initState -name top.AXI.axi_m1_cdc.w_m2s.rptr_wclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_m1_cdc.w_m2s.f1_wptr        -value 0
+# define_tag -tag initState -name top.AXI.axi_m1_cdc.w_m2s.wptr_rclk      -value 0
+
+# AR 
+# define_tag -tag initState -name top.AXI.axi_m1_cdc.ar_m2s.wbin 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_m1_cdc.ar_m2s.wptr_wclk     -value 0
+# define_tag -tag initState -name top.AXI.axi_m1_cdc.ar_m2s.wfull 	      -value 0
+# define_tag -tag initState -name top.AXI.axi_m1_cdc.ar_m2s.rbin          -value 0
+# define_tag -tag initState -name top.AXI.axi_m1_cdc.ar_m2s.rptr_rclk     -value 0
+# define_tag -tag initState -name top.AXI.axi_m1_cdc.ar_m2s.rempty        -value 0
+# define_tag -tag initState -name top.AXI.axi_m1_cdc.ar_m2s.f1_rptr       -value 0
+# define_tag -tag initState -name top.AXI.axi_m1_cdc.ar_m2s.rptr_wclk     -value 0
+# define_tag -tag initState -name top.AXI.axi_m1_cdc.ar_m2s.f1_wptr       -value 0
+# define_tag -tag initState -name top.AXI.axi_m1_cdc.ar_m2s.wptr_rclk     -value 0
+
+# # R
+# define_tag -tag initState -name top.AXI.axi_m1_cdc.r_s2m.wbin 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_m1_cdc.r_s2m.wptr_wclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_m1_cdc.r_s2m.wfull 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_m1_cdc.r_s2m.rbin           -value 0
+# define_tag -tag initState -name top.AXI.axi_m1_cdc.r_s2m.rptr_rclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_m1_cdc.r_s2m.rempty         -value 0
+# define_tag -tag initState -name top.AXI.axi_m1_cdc.r_s2m.f1_rptr        -value 0
+# define_tag -tag initState -name top.AXI.axi_m1_cdc.r_s2m.rptr_wclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_m1_cdc.r_s2m.f1_wptr        -value 0
+# define_tag -tag initState -name top.AXI.axi_m1_cdc.r_s2m.wptr_rclk      -value 0
+
+# # B
+# define_tag -tag initState -name top.AXI.axi_m1_cdc.b_s2m.wbin 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_m1_cdc.b_s2m.wptr_wclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_m1_cdc.b_s2m.wfull 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_m1_cdc.b_s2m.rbin           -value 0
+# define_tag -tag initState -name top.AXI.axi_m1_cdc.b_s2m.rptr_rclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_m1_cdc.b_s2m.rempty         -value 0
+# define_tag -tag initState -name top.AXI.axi_m1_cdc.b_s2m.f1_rptr        -value 0
+# define_tag -tag initState -name top.AXI.axi_m1_cdc.b_s2m.rptr_wclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_m1_cdc.b_s2m.f1_wptr        -value 0
+# define_tag -tag initState -name top.AXI.axi_m1_cdc.b_s2m.wptr_rclk      -value 0
+
+
+
+# # ---------------- axi_s0_cdc ---------------- #
+# # AW
+# define_tag -tag initState -name top.AXI.axi_s0_cdc.aw_m2s.wbin 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_s0_cdc.aw_m2s.wptr_wclk     -value 0
+# define_tag -tag initState -name top.AXI.axi_s0_cdc.aw_m2s.wfull 	      -value 0
+# define_tag -tag initState -name top.AXI.axi_s0_cdc.aw_m2s.rbin          -value 0
+# define_tag -tag initState -name top.AXI.axi_s0_cdc.aw_m2s.rptr_rclk     -value 0
+# define_tag -tag initState -name top.AXI.axi_s0_cdc.aw_m2s.rempty        -value 0
+# define_tag -tag initState -name top.AXI.axi_s0_cdc.aw_m2s.f1_rptr       -value 0
+# define_tag -tag initState -name top.AXI.axi_s0_cdc.aw_m2s.rptr_wclk     -value 0
+# define_tag -tag initState -name top.AXI.axi_s0_cdc.aw_m2s.f1_wptr       -value 0
+# define_tag -tag initState -name top.AXI.axi_s0_cdc.aw_m2s.wptr_rclk     -value 0
+
+# # W
+# define_tag -tag initState -name top.AXI.axi_s0_cdc.w_m2s.wbin 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_s0_cdc.w_m2s.wptr_wclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_s0_cdc.w_m2s.wfull 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_s0_cdc.w_m2s.rbin           -value 0
+# define_tag -tag initState -name top.AXI.axi_s0_cdc.w_m2s.rptr_rclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_s0_cdc.w_m2s.rempty         -value 0
+# define_tag -tag initState -name top.AXI.axi_s0_cdc.w_m2s.f1_rptr        -value 0
+# define_tag -tag initState -name top.AXI.axi_s0_cdc.w_m2s.rptr_wclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_s0_cdc.w_m2s.f1_wptr        -value 0
+# define_tag -tag initState -name top.AXI.axi_s0_cdc.w_m2s.wptr_rclk      -value 0
+
+# # AR 
+# define_tag -tag initState -name top.AXI.axi_s0_cdc.ar_m2s.wbin 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_s0_cdc.ar_m2s.wptr_wclk     -value 0
+# define_tag -tag initState -name top.AXI.axi_s0_cdc.ar_m2s.wfull 	      -value 0
+# define_tag -tag initState -name top.AXI.axi_s0_cdc.ar_m2s.rbin          -value 0
+# define_tag -tag initState -name top.AXI.axi_s0_cdc.ar_m2s.rptr_rclk     -value 0
+# define_tag -tag initState -name top.AXI.axi_s0_cdc.ar_m2s.rempty        -value 0
+# define_tag -tag initState -name top.AXI.axi_s0_cdc.ar_m2s.f1_rptr       -value 0
+# define_tag -tag initState -name top.AXI.axi_s0_cdc.ar_m2s.rptr_wclk     -value 0
+# define_tag -tag initState -name top.AXI.axi_s0_cdc.ar_m2s.f1_wptr       -value 0
+# define_tag -tag initState -name top.AXI.axi_s0_cdc.ar_m2s.wptr_rclk     -value 0
+
+# # R
+# define_tag -tag initState -name top.AXI.axi_s0_cdc.r_s2m.wbin 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_s0_cdc.r_s2m.wptr_wclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_s0_cdc.r_s2m.wfull 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_s0_cdc.r_s2m.rbin           -value 0
+# define_tag -tag initState -name top.AXI.axi_s0_cdc.r_s2m.rptr_rclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_s0_cdc.r_s2m.rempty         -value 0
+# define_tag -tag initState -name top.AXI.axi_s0_cdc.r_s2m.f1_rptr        -value 0
+# define_tag -tag initState -name top.AXI.axi_s0_cdc.r_s2m.rptr_wclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_s0_cdc.r_s2m.f1_wptr        -value 0
+# define_tag -tag initState -name top.AXI.axi_s0_cdc.r_s2m.wptr_rclk      -value 0
+
+# # B
+# define_tag -tag initState -name top.AXI.axi_s0_cdc.b_s2m.wbin 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_s0_cdc.b_s2m.wptr_wclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_s0_cdc.b_s2m.wfull 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_s0_cdc.b_s2m.rbin           -value 0
+# define_tag -tag initState -name top.AXI.axi_s0_cdc.b_s2m.rptr_rclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_s0_cdc.b_s2m.rempty         -value 0
+# define_tag -tag initState -name top.AXI.axi_s0_cdc.b_s2m.f1_rptr        -value 0
+# define_tag -tag initState -name top.AXI.axi_s0_cdc.b_s2m.rptr_wclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_s0_cdc.b_s2m.f1_wptr        -value 0
+# define_tag -tag initState -name top.AXI.axi_s0_cdc.b_s2m.wptr_rclk      -value 0
+
+
+# # ---------------- axi_s1_cdc ---------------- #
+# # AW
+# define_tag -tag initState -name top.AXI.axi_s1_cdc.aw_m2s.wbin 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_s1_cdc.aw_m2s.wptr_wclk     -value 0
+# define_tag -tag initState -name top.AXI.axi_s1_cdc.aw_m2s.wfull 	      -value 0
+# define_tag -tag initState -name top.AXI.axi_s1_cdc.aw_m2s.rbin          -value 0
+# define_tag -tag initState -name top.AXI.axi_s1_cdc.aw_m2s.rptr_rclk     -value 0
+# define_tag -tag initState -name top.AXI.axi_s1_cdc.aw_m2s.rempty        -value 0
+# define_tag -tag initState -name top.AXI.axi_s1_cdc.aw_m2s.f1_rptr       -value 0
+# define_tag -tag initState -name top.AXI.axi_s1_cdc.aw_m2s.rptr_wclk     -value 0
+# define_tag -tag initState -name top.AXI.axi_s1_cdc.aw_m2s.f1_wptr       -value 0
+# define_tag -tag initState -name top.AXI.axi_s1_cdc.aw_m2s.wptr_rclk     -value 0
+
+# # W
+# define_tag -tag initState -name top.AXI.axi_s1_cdc.w_m2s.wbin 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_s1_cdc.w_m2s.wptr_wclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_s1_cdc.w_m2s.wfull 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_s1_cdc.w_m2s.rbin           -value 0
+# define_tag -tag initState -name top.AXI.axi_s1_cdc.w_m2s.rptr_rclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_s1_cdc.w_m2s.rempty         -value 0
+# define_tag -tag initState -name top.AXI.axi_s1_cdc.w_m2s.f1_rptr        -value 0
+# define_tag -tag initState -name top.AXI.axi_s1_cdc.w_m2s.rptr_wclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_s1_cdc.w_m2s.f1_wptr        -value 0
+# define_tag -tag initState -name top.AXI.axi_s1_cdc.w_m2s.wptr_rclk      -value 0
+
+# # AR 
+# define_tag -tag initState -name top.AXI.axi_s1_cdc.ar_m2s.wbin 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_s1_cdc.ar_m2s.wptr_wclk     -value 0
+# define_tag -tag initState -name top.AXI.axi_s1_cdc.ar_m2s.wfull 	      -value 0
+# define_tag -tag initState -name top.AXI.axi_s1_cdc.ar_m2s.rbin          -value 0
+# define_tag -tag initState -name top.AXI.axi_s1_cdc.ar_m2s.rptr_rclk     -value 0
+# define_tag -tag initState -name top.AXI.axi_s1_cdc.ar_m2s.rempty        -value 0
+# define_tag -tag initState -name top.AXI.axi_s1_cdc.ar_m2s.f1_rptr       -value 0
+# define_tag -tag initState -name top.AXI.axi_s1_cdc.ar_m2s.rptr_wclk     -value 0
+# define_tag -tag initState -name top.AXI.axi_s1_cdc.ar_m2s.f1_wptr       -value 0
+# define_tag -tag initState -name top.AXI.axi_s1_cdc.ar_m2s.wptr_rclk     -value 0
+
+# # R
+# define_tag -tag initState -name top.AXI.axi_s1_cdc.r_s2m.wbin 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_s1_cdc.r_s2m.wptr_wclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_s1_cdc.r_s2m.wfull 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_s1_cdc.r_s2m.rbin           -value 0
+# define_tag -tag initState -name top.AXI.axi_s1_cdc.r_s2m.rptr_rclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_s1_cdc.r_s2m.rempty         -value 0
+# define_tag -tag initState -name top.AXI.axi_s1_cdc.r_s2m.f1_rptr        -value 0
+# define_tag -tag initState -name top.AXI.axi_s1_cdc.r_s2m.rptr_wclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_s1_cdc.r_s2m.f1_wptr        -value 0
+# define_tag -tag initState -name top.AXI.axi_s1_cdc.r_s2m.wptr_rclk      -value 0
+
+# # B
+# define_tag -tag initState -name top.AXI.axi_s1_cdc.b_s2m.wbin 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_s1_cdc.b_s2m.wptr_wclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_s1_cdc.b_s2m.wfull 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_s1_cdc.b_s2m.rbin           -value 0
+# define_tag -tag initState -name top.AXI.axi_s1_cdc.b_s2m.rptr_rclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_s1_cdc.b_s2m.rempty         -value 0
+# define_tag -tag initState -name top.AXI.axi_s1_cdc.b_s2m.f1_rptr        -value 0
+# define_tag -tag initState -name top.AXI.axi_s1_cdc.b_s2m.rptr_wclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_s1_cdc.b_s2m.f1_wptr        -value 0
+# define_tag -tag initState -name top.AXI.axi_s1_cdc.b_s2m.wptr_rclk      -value 0
+
+
+# # ---------------- axi_s2_cdc ---------------- #
+# # AW
+# define_tag -tag initState -name top.AXI.axi_s2_cdc.aw_m2s.wbin 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_s2_cdc.aw_m2s.wptr_wclk     -value 0
+# define_tag -tag initState -name top.AXI.axi_s2_cdc.aw_m2s.wfull 	      -value 0
+# define_tag -tag initState -name top.AXI.axi_s2_cdc.aw_m2s.rbin          -value 0
+# define_tag -tag initState -name top.AXI.axi_s2_cdc.aw_m2s.rptr_rclk     -value 0
+# define_tag -tag initState -name top.AXI.axi_s2_cdc.aw_m2s.rempty        -value 0
+# define_tag -tag initState -name top.AXI.axi_s2_cdc.aw_m2s.f1_rptr       -value 0
+# define_tag -tag initState -name top.AXI.axi_s2_cdc.aw_m2s.rptr_wclk     -value 0
+# define_tag -tag initState -name top.AXI.axi_s2_cdc.aw_m2s.f1_wptr       -value 0
+# define_tag -tag initState -name top.AXI.axi_s2_cdc.aw_m2s.wptr_rclk     -value 0
+
+# # W
+# define_tag -tag initState -name top.AXI.axi_s2_cdc.w_m2s.wbin 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_s2_cdc.w_m2s.wptr_wclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_s2_cdc.w_m2s.wfull 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_s2_cdc.w_m2s.rbin           -value 0
+# define_tag -tag initState -name top.AXI.axi_s2_cdc.w_m2s.rptr_rclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_s2_cdc.w_m2s.rempty         -value 0
+# define_tag -tag initState -name top.AXI.axi_s2_cdc.w_m2s.f1_rptr        -value 0
+# define_tag -tag initState -name top.AXI.axi_s2_cdc.w_m2s.rptr_wclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_s2_cdc.w_m2s.f1_wptr        -value 0
+# define_tag -tag initState -name top.AXI.axi_s2_cdc.w_m2s.wptr_rclk      -value 0
+
+# # AR 
+# define_tag -tag initState -name top.AXI.axi_s2_cdc.ar_m2s.wbin 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_s2_cdc.ar_m2s.wptr_wclk     -value 0
+# define_tag -tag initState -name top.AXI.axi_s2_cdc.ar_m2s.wfull 	      -value 0
+# define_tag -tag initState -name top.AXI.axi_s2_cdc.ar_m2s.rbin          -value 0
+# define_tag -tag initState -name top.AXI.axi_s2_cdc.ar_m2s.rptr_rclk     -value 0
+# define_tag -tag initState -name top.AXI.axi_s2_cdc.ar_m2s.rempty        -value 0
+# define_tag -tag initState -name top.AXI.axi_s2_cdc.ar_m2s.f1_rptr       -value 0
+# define_tag -tag initState -name top.AXI.axi_s2_cdc.ar_m2s.rptr_wclk     -value 0
+# define_tag -tag initState -name top.AXI.axi_s2_cdc.ar_m2s.f1_wptr       -value 0
+# define_tag -tag initState -name top.AXI.axi_s2_cdc.ar_m2s.wptr_rclk     -value 0
+
+# # R
+# define_tag -tag initState -name top.AXI.axi_s2_cdc.r_s2m.wbin 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_s2_cdc.r_s2m.wptr_wclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_s2_cdc.r_s2m.wfull 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_s2_cdc.r_s2m.rbin           -value 0
+# define_tag -tag initState -name top.AXI.axi_s2_cdc.r_s2m.rptr_rclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_s2_cdc.r_s2m.rempty         -value 0
+# define_tag -tag initState -name top.AXI.axi_s2_cdc.r_s2m.f1_rptr        -value 0
+# define_tag -tag initState -name top.AXI.axi_s2_cdc.r_s2m.rptr_wclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_s2_cdc.r_s2m.f1_wptr        -value 0
+# define_tag -tag initState -name top.AXI.axi_s2_cdc.r_s2m.wptr_rclk      -value 0
+
+# # B
+# define_tag -tag initState -name top.AXI.axi_s2_cdc.b_s2m.wbin 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_s2_cdc.b_s2m.wptr_wclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_s2_cdc.b_s2m.wfull 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_s2_cdc.b_s2m.rbin           -value 0
+# define_tag -tag initState -name top.AXI.axi_s2_cdc.b_s2m.rptr_rclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_s2_cdc.b_s2m.rempty         -value 0
+# define_tag -tag initState -name top.AXI.axi_s2_cdc.b_s2m.f1_rptr        -value 0
+# define_tag -tag initState -name top.AXI.axi_s2_cdc.b_s2m.rptr_wclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_s2_cdc.b_s2m.f1_wptr        -value 0
+# define_tag -tag initState -name top.AXI.axi_s2_cdc.b_s2m.wptr_rclk      -value 0
+
+
+
+# # ---------------- axi_s3_cdc ---------------- #
+# # AW
+# define_tag -tag initState -name top.AXI.axi_s3_cdc.aw_m2s.wbin 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_s3_cdc.aw_m2s.wptr_wclk     -value 0
+# define_tag -tag initState -name top.AXI.axi_s3_cdc.aw_m2s.wfull 	      -value 0
+# define_tag -tag initState -name top.AXI.axi_s3_cdc.aw_m2s.rbin          -value 0
+# define_tag -tag initState -name top.AXI.axi_s3_cdc.aw_m2s.rptr_rclk     -value 0
+# define_tag -tag initState -name top.AXI.axi_s3_cdc.aw_m2s.rempty        -value 0
+# define_tag -tag initState -name top.AXI.axi_s3_cdc.aw_m2s.f1_rptr       -value 0
+# define_tag -tag initState -name top.AXI.axi_s3_cdc.aw_m2s.rptr_wclk     -value 0
+# define_tag -tag initState -name top.AXI.axi_s3_cdc.aw_m2s.f1_wptr       -value 0
+# define_tag -tag initState -name top.AXI.axi_s3_cdc.aw_m2s.wptr_rclk     -value 0
+
+# # W
+# define_tag -tag initState -name top.AXI.axi_s3_cdc.w_m2s.wbin 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_s3_cdc.w_m2s.wptr_wclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_s3_cdc.w_m2s.wfull 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_s3_cdc.w_m2s.rbin           -value 0
+# define_tag -tag initState -name top.AXI.axi_s3_cdc.w_m2s.rptr_rclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_s3_cdc.w_m2s.rempty         -value 0
+# define_tag -tag initState -name top.AXI.axi_s3_cdc.w_m2s.f1_rptr        -value 0
+# define_tag -tag initState -name top.AXI.axi_s3_cdc.w_m2s.rptr_wclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_s3_cdc.w_m2s.f1_wptr        -value 0
+# define_tag -tag initState -name top.AXI.axi_s3_cdc.w_m2s.wptr_rclk      -value 0
+
+# # AR 
+# define_tag -tag initState -name top.AXI.axi_s3_cdc.ar_m2s.wbin 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_s3_cdc.ar_m2s.wptr_wclk     -value 0
+# define_tag -tag initState -name top.AXI.axi_s3_cdc.ar_m2s.wfull 	      -value 0
+# define_tag -tag initState -name top.AXI.axi_s3_cdc.ar_m2s.rbin          -value 0
+# define_tag -tag initState -name top.AXI.axi_s3_cdc.ar_m2s.rptr_rclk     -value 0
+# define_tag -tag initState -name top.AXI.axi_s3_cdc.ar_m2s.rempty        -value 0
+# define_tag -tag initState -name top.AXI.axi_s3_cdc.ar_m2s.f1_rptr       -value 0
+# define_tag -tag initState -name top.AXI.axi_s3_cdc.ar_m2s.rptr_wclk     -value 0
+# define_tag -tag initState -name top.AXI.axi_s3_cdc.ar_m2s.f1_wptr       -value 0
+# define_tag -tag initState -name top.AXI.axi_s3_cdc.ar_m2s.wptr_rclk     -value 0
+
+# # R
+# define_tag -tag initState -name top.AXI.axi_s3_cdc.r_s2m.wbin 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_s3_cdc.r_s2m.wptr_wclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_s3_cdc.r_s2m.wfull 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_s3_cdc.r_s2m.rbin           -value 0
+# define_tag -tag initState -name top.AXI.axi_s3_cdc.r_s2m.rptr_rclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_s3_cdc.r_s2m.rempty         -value 0
+# define_tag -tag initState -name top.AXI.axi_s3_cdc.r_s2m.f1_rptr        -value 0
+# define_tag -tag initState -name top.AXI.axi_s3_cdc.r_s2m.rptr_wclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_s3_cdc.r_s2m.f1_wptr        -value 0
+# define_tag -tag initState -name top.AXI.axi_s3_cdc.r_s2m.wptr_rclk      -value 0
+
+# # B
+# define_tag -tag initState -name top.AXI.axi_s3_cdc.b_s2m.wbin 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_s3_cdc.b_s2m.wptr_wclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_s3_cdc.b_s2m.wfull 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_s3_cdc.b_s2m.rbin           -value 0
+# define_tag -tag initState -name top.AXI.axi_s3_cdc.b_s2m.rptr_rclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_s3_cdc.b_s2m.rempty         -value 0
+# define_tag -tag initState -name top.AXI.axi_s3_cdc.b_s2m.f1_rptr        -value 0
+# define_tag -tag initState -name top.AXI.axi_s3_cdc.b_s2m.rptr_wclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_s3_cdc.b_s2m.f1_wptr        -value 0
+# define_tag -tag initState -name top.AXI.axi_s3_cdc.b_s2m.wptr_rclk      -value 0
+
+
+
+
+
+# # ---------------- axi_s4_cdc ---------------- #
+# # AW
+# define_tag -tag initState -name top.AXI.axi_s4_cdc.aw_m2s.wbin 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_s4_cdc.aw_m2s.wptr_wclk     -value 0
+# define_tag -tag initState -name top.AXI.axi_s4_cdc.aw_m2s.wfull 	      -value 0
+# define_tag -tag initState -name top.AXI.axi_s4_cdc.aw_m2s.rbin          -value 0
+# define_tag -tag initState -name top.AXI.axi_s4_cdc.aw_m2s.rptr_rclk     -value 0
+# define_tag -tag initState -name top.AXI.axi_s4_cdc.aw_m2s.rempty        -value 0
+# define_tag -tag initState -name top.AXI.axi_s4_cdc.aw_m2s.f1_rptr       -value 0
+# define_tag -tag initState -name top.AXI.axi_s4_cdc.aw_m2s.rptr_wclk     -value 0
+# define_tag -tag initState -name top.AXI.axi_s4_cdc.aw_m2s.f1_wptr       -value 0
+# define_tag -tag initState -name top.AXI.axi_s4_cdc.aw_m2s.wptr_rclk     -value 0
+
+# # W
+# define_tag -tag initState -name top.AXI.axi_s4_cdc.w_m2s.wbin 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_s4_cdc.w_m2s.wptr_wclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_s4_cdc.w_m2s.wfull 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_s4_cdc.w_m2s.rbin           -value 0
+# define_tag -tag initState -name top.AXI.axi_s4_cdc.w_m2s.rptr_rclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_s4_cdc.w_m2s.rempty         -value 0
+# define_tag -tag initState -name top.AXI.axi_s4_cdc.w_m2s.f1_rptr        -value 0
+# define_tag -tag initState -name top.AXI.axi_s4_cdc.w_m2s.rptr_wclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_s4_cdc.w_m2s.f1_wptr        -value 0
+# define_tag -tag initState -name top.AXI.axi_s4_cdc.w_m2s.wptr_rclk      -value 0
+
+# # AR 
+# define_tag -tag initState -name top.AXI.axi_s4_cdc.ar_m2s.wbin 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_s4_cdc.ar_m2s.wptr_wclk     -value 0
+# define_tag -tag initState -name top.AXI.axi_s4_cdc.ar_m2s.wfull 	      -value 0
+# define_tag -tag initState -name top.AXI.axi_s4_cdc.ar_m2s.rbin          -value 0
+# define_tag -tag initState -name top.AXI.axi_s4_cdc.ar_m2s.rptr_rclk     -value 0
+# define_tag -tag initState -name top.AXI.axi_s4_cdc.ar_m2s.rempty        -value 0
+# define_tag -tag initState -name top.AXI.axi_s4_cdc.ar_m2s.f1_rptr       -value 0
+# define_tag -tag initState -name top.AXI.axi_s4_cdc.ar_m2s.rptr_wclk     -value 0
+# define_tag -tag initState -name top.AXI.axi_s4_cdc.ar_m2s.f1_wptr       -value 0
+# define_tag -tag initState -name top.AXI.axi_s4_cdc.ar_m2s.wptr_rclk     -value 0
+
+# # R
+# define_tag -tag initState -name top.AXI.axi_s4_cdc.r_s2m.wbin 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_s4_cdc.r_s2m.wptr_wclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_s4_cdc.r_s2m.wfull 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_s4_cdc.r_s2m.rbin           -value 0
+# define_tag -tag initState -name top.AXI.axi_s4_cdc.r_s2m.rptr_rclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_s4_cdc.r_s2m.rempty         -value 0
+# define_tag -tag initState -name top.AXI.axi_s4_cdc.r_s2m.f1_rptr        -value 0
+# define_tag -tag initState -name top.AXI.axi_s4_cdc.r_s2m.rptr_wclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_s4_cdc.r_s2m.f1_wptr        -value 0
+# define_tag -tag initState -name top.AXI.axi_s4_cdc.r_s2m.wptr_rclk      -value 0
+
+# # B
+# define_tag -tag initState -name top.AXI.axi_s4_cdc.b_s2m.wbin 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_s4_cdc.b_s2m.wptr_wclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_s4_cdc.b_s2m.wfull 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_s4_cdc.b_s2m.rbin           -value 0
+# define_tag -tag initState -name top.AXI.axi_s4_cdc.b_s2m.rptr_rclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_s4_cdc.b_s2m.rempty         -value 0
+# define_tag -tag initState -name top.AXI.axi_s4_cdc.b_s2m.f1_rptr        -value 0
+# define_tag -tag initState -name top.AXI.axi_s4_cdc.b_s2m.rptr_wclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_s4_cdc.b_s2m.f1_wptr        -value 0
+# define_tag -tag initState -name top.AXI.axi_s4_cdc.b_s2m.wptr_rclk      -value 0
+
+
+# # ---------------- axi_s5_cdc ---------------- #
+# # AW
+# define_tag -tag initState -name top.AXI.axi_s5_cdc.aw_m2s.wbin 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_s5_cdc.aw_m2s.wptr_wclk     -value 0
+# define_tag -tag initState -name top.AXI.axi_s5_cdc.aw_m2s.wfull 	      -value 0
+# define_tag -tag initState -name top.AXI.axi_s5_cdc.aw_m2s.rbin          -value 0
+# define_tag -tag initState -name top.AXI.axi_s5_cdc.aw_m2s.rptr_rclk     -value 0
+# define_tag -tag initState -name top.AXI.axi_s5_cdc.aw_m2s.rempty        -value 0
+# define_tag -tag initState -name top.AXI.axi_s5_cdc.aw_m2s.f1_rptr       -value 0
+# define_tag -tag initState -name top.AXI.axi_s5_cdc.aw_m2s.rptr_wclk     -value 0
+# define_tag -tag initState -name top.AXI.axi_s5_cdc.aw_m2s.f1_wptr       -value 0
+# define_tag -tag initState -name top.AXI.axi_s5_cdc.aw_m2s.wptr_rclk     -value 0
+
+# # W
+# define_tag -tag initState -name top.AXI.axi_s5_cdc.w_m2s.wbin 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_s5_cdc.w_m2s.wptr_wclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_s5_cdc.w_m2s.wfull 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_s5_cdc.w_m2s.rbin           -value 0
+# define_tag -tag initState -name top.AXI.axi_s5_cdc.w_m2s.rptr_rclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_s5_cdc.w_m2s.rempty         -value 0
+# define_tag -tag initState -name top.AXI.axi_s5_cdc.w_m2s.f1_rptr        -value 0
+# define_tag -tag initState -name top.AXI.axi_s5_cdc.w_m2s.rptr_wclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_s5_cdc.w_m2s.f1_wptr        -value 0
+# define_tag -tag initState -name top.AXI.axi_s5_cdc.w_m2s.wptr_rclk      -value 0
+
+# # AR 
+# define_tag -tag initState -name top.AXI.axi_s5_cdc.ar_m2s.wbin 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_s5_cdc.ar_m2s.wptr_wclk     -value 0
+# define_tag -tag initState -name top.AXI.axi_s5_cdc.ar_m2s.wfull 	      -value 0
+# define_tag -tag initState -name top.AXI.axi_s5_cdc.ar_m2s.rbin          -value 0
+# define_tag -tag initState -name top.AXI.axi_s5_cdc.ar_m2s.rptr_rclk     -value 0
+# define_tag -tag initState -name top.AXI.axi_s5_cdc.ar_m2s.rempty        -value 0
+# define_tag -tag initState -name top.AXI.axi_s5_cdc.ar_m2s.f1_rptr       -value 0
+# define_tag -tag initState -name top.AXI.axi_s5_cdc.ar_m2s.rptr_wclk     -value 0
+# define_tag -tag initState -name top.AXI.axi_s5_cdc.ar_m2s.f1_wptr       -value 0
+# define_tag -tag initState -name top.AXI.axi_s5_cdc.ar_m2s.wptr_rclk     -value 0
+
+# # R
+# define_tag -tag initState -name top.AXI.axi_s5_cdc.r_s2m.wbin 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_s5_cdc.r_s2m.wptr_wclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_s5_cdc.r_s2m.wfull 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_s5_cdc.r_s2m.rbin           -value 0
+# define_tag -tag initState -name top.AXI.axi_s5_cdc.r_s2m.rptr_rclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_s5_cdc.r_s2m.rempty         -value 0
+# define_tag -tag initState -name top.AXI.axi_s5_cdc.r_s2m.f1_rptr        -value 0
+# define_tag -tag initState -name top.AXI.axi_s5_cdc.r_s2m.rptr_wclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_s5_cdc.r_s2m.f1_wptr        -value 0
+# define_tag -tag initState -name top.AXI.axi_s5_cdc.r_s2m.wptr_rclk      -value 0
+
+# # B
+# define_tag -tag initState -name top.AXI.axi_s5_cdc.b_s2m.wbin 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_s5_cdc.b_s2m.wptr_wclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_s5_cdc.b_s2m.wfull 	        -value 0
+# define_tag -tag initState -name top.AXI.axi_s5_cdc.b_s2m.rbin           -value 0
+# define_tag -tag initState -name top.AXI.axi_s5_cdc.b_s2m.rptr_rclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_s5_cdc.b_s2m.rempty         -value 0
+# define_tag -tag initState -name top.AXI.axi_s5_cdc.b_s2m.f1_rptr        -value 0
+# define_tag -tag initState -name top.AXI.axi_s5_cdc.b_s2m.rptr_wclk      -value 0
+# define_tag -tag initState -name top.AXI.axi_s5_cdc.b_s2m.f1_wptr        -value 0
+# define_tag -tag initState -name top.AXI.axi_s5_cdc.b_s2m.wptr_rclk      -value 0
+
+
+waive -rule Ar_syncrst_setupcheck01
+
+#  async fifo source flip-flop is a static signal, no synchronization may be required
+# m0
+# quasi_static -name top.AFIFO_Tx_AW_M0.FIFO_MEMORY
+# quasi_static -name top.AFIFO_Tx_W_M0.FIFO_MEMORY
+# quasi_static -name top.AFIFO_Tx_B_M0.FIFO_MEMORY
+quasi_static -name top.AFIFO_Tx_AR_M0.FIFO_MEMORY
+quasi_static -name top.AFIFO_Tx_R_M0.FIFO_MEMORY
+gray_signals -name top.R_PTR_GRAY_AR_M0
+gray_signals -name top.W_PTR_GRAY_AR_M0
+gray_signals -name top.R_PTR_GRAY_R_M0
+gray_signals -name top.W_PTR_GRAY_R_M0
+# m1
+quasi_static -name top.AFIFO_Tx_AW_M1.FIFO_MEMORY
+quasi_static -name top.AFIFO_Tx_W_M1.FIFO_MEMORY
+quasi_static -name top.AFIFO_Tx_B_M1.FIFO_MEMORY
+quasi_static -name top.AFIFO_Tx_AR_M1.FIFO_MEMORY
+quasi_static -name top.AFIFO_Tx_R_M1.FIFO_MEMORY
+gray_signals -name top.R_PTR_GRAY_AR_M1
+gray_signals -name top.W_PTR_GRAY_AR_M1
+gray_signals -name top.R_PTR_GRAY_R_M1
+gray_signals -name top.W_PTR_GRAY_R_M1
+gray_signals -name top.R_PTR_GRAY_AW_M1
+gray_signals -name top.W_PTR_GRAY_AW_M1
+gray_signals -name top.R_PTR_GRAY_W_M1
+gray_signals -name top.W_PTR_GRAY_W_M1
+gray_signals -name top.R_PTR_GRAY_B_M1
+gray_signals -name top.W_PTR_GRAY_B_M1
+
+
+# s0
+# quasi_static -name top.AFIFO_Tx_AW_S0.FIFO_MEMORY
+# quasi_static -name top.AFIFO_Tx_W_S0.FIFO_MEMORY
+# quasi_static -name top.AFIFO_Tx_B_S0.FIFO_MEMORY
+quasi_static -name top.AFIFO_Tx_AR_S0.FIFO_MEMORY
+quasi_static -name top.AFIFO_Tx_R_S0.FIFO_MEMORY
+gray_signals -name top.R_PTR_GRAY_AR_S0
+gray_signals -name top.W_PTR_GRAY_AR_S0
+gray_signals -name top.R_PTR_GRAY_R_S0
+gray_signals -name top.W_PTR_GRAY_R_S0
+# gray_signals -name top.R_PTR_GRAY_AW_S0
+# gray_signals -name top.W_PTR_GRAY_AW_S0
+# gray_signals -name top.R_PTR_GRAY_W_S0
+# gray_signals -name top.W_PTR_GRAY_W_S0
+# gray_signals -name top.R_PTR_GRAY_B_S0
+# gray_signals -name top.W_PTR_GRAY_B_S0
+# s1
+quasi_static -name top.AFIFO_Tx_AW_S1.FIFO_MEMORY
+quasi_static -name top.AFIFO_Tx_W_S1.FIFO_MEMORY
+quasi_static -name top.AFIFO_Tx_B_S1.FIFO_MEMORY
+quasi_static -name top.AFIFO_Tx_AR_S1.FIFO_MEMORY
+quasi_static -name top.AFIFO_Tx_R_S1.FIFO_MEMORY
+gray_signals -name top.R_PTR_GRAY_AR_S1
+gray_signals -name top.W_PTR_GRAY_AR_S1
+gray_signals -name top.R_PTR_GRAY_R_S1
+gray_signals -name top.W_PTR_GRAY_R_S1
+gray_signals -name top.R_PTR_GRAY_AW_S1
+gray_signals -name top.W_PTR_GRAY_AW_S1
+gray_signals -name top.R_PTR_GRAY_W_S1
+gray_signals -name top.W_PTR_GRAY_W_S1
+gray_signals -name top.R_PTR_GRAY_B_S1
+gray_signals -name top.W_PTR_GRAY_B_S1
+# s2
+quasi_static -name top.AFIFO_Tx_AW_S2.FIFO_MEMORY
+quasi_static -name top.AFIFO_Tx_W_S2.FIFO_MEMORY
+quasi_static -name top.AFIFO_Tx_B_S2.FIFO_MEMORY
+quasi_static -name top.AFIFO_Tx_AR_S2.FIFO_MEMORY
+quasi_static -name top.AFIFO_Tx_R_S2.FIFO_MEMORY
+gray_signals -name top.R_PTR_GRAY_AR_S2
+gray_signals -name top.W_PTR_GRAY_AR_S2
+gray_signals -name top.R_PTR_GRAY_R_S2
+gray_signals -name top.W_PTR_GRAY_R_S2
+gray_signals -name top.R_PTR_GRAY_AW_S2
+gray_signals -name top.W_PTR_GRAY_AW_S2
+gray_signals -name top.R_PTR_GRAY_W_S2
+gray_signals -name top.W_PTR_GRAY_W_S2
+gray_signals -name top.R_PTR_GRAY_B_S2
+gray_signals -name top.W_PTR_GRAY_B_S2
+# s3
+quasi_static -name top.AFIFO_Tx_AW_S3.FIFO_MEMORY
+quasi_static -name top.AFIFO_Tx_W_S3.FIFO_MEMORY
+quasi_static -name top.AFIFO_Tx_B_S3.FIFO_MEMORY
+quasi_static -name top.AFIFO_Tx_AR_S3.FIFO_MEMORY
+quasi_static -name top.AFIFO_Tx_R_S3.FIFO_MEMORY
+gray_signals -name top.R_PTR_GRAY_AR_S3
+gray_signals -name top.W_PTR_GRAY_AR_S3
+gray_signals -name top.R_PTR_GRAY_R_S3
+gray_signals -name top.W_PTR_GRAY_R_S3
+gray_signals -name top.R_PTR_GRAY_AW_S3
+gray_signals -name top.W_PTR_GRAY_AW_S3
+gray_signals -name top.R_PTR_GRAY_W_S3
+gray_signals -name top.W_PTR_GRAY_W_S3
+gray_signals -name top.R_PTR_GRAY_B_S3
+gray_signals -name top.W_PTR_GRAY_B_S3
+# s4
+quasi_static -name top.AFIFO_Tx_AW_S4.FIFO_MEMORY
+quasi_static -name top.AFIFO_Tx_W_S4.FIFO_MEMORY
+quasi_static -name top.AFIFO_Tx_B_S4.FIFO_MEMORY
+quasi_static -name top.AFIFO_Tx_AR_S4.FIFO_MEMORY
+quasi_static -name top.AFIFO_Tx_R_S4.FIFO_MEMORY
+gray_signals -name top.R_PTR_GRAY_AR_S4
+gray_signals -name top.W_PTR_GRAY_AR_S4
+gray_signals -name top.R_PTR_GRAY_R_S4
+gray_signals -name top.W_PTR_GRAY_R_S4
+gray_signals -name top.R_PTR_GRAY_AW_S4
+gray_signals -name top.W_PTR_GRAY_AW_S4
+gray_signals -name top.R_PTR_GRAY_W_S4
+gray_signals -name top.W_PTR_GRAY_W_S4
+gray_signals -name top.R_PTR_GRAY_B_S4
+gray_signals -name top.W_PTR_GRAY_B_S4
+# s5
+quasi_static -name top.AFIFO_Tx_AW_S5.FIFO_MEMORY
+quasi_static -name top.AFIFO_Tx_W_S5.FIFO_MEMORY
+quasi_static -name top.AFIFO_Tx_B_S5.FIFO_MEMORY
+quasi_static -name top.AFIFO_Tx_AR_S5.FIFO_MEMORY
+quasi_static -name top.AFIFO_Tx_R_S5.FIFO_MEMORY
+gray_signals -name top.R_PTR_GRAY_AR_S5
+gray_signals -name top.W_PTR_GRAY_AR_S5
+gray_signals -name top.R_PTR_GRAY_R_S5
+gray_signals -name top.W_PTR_GRAY_R_S5
+gray_signals -name top.R_PTR_GRAY_AW_S5
+gray_signals -name top.W_PTR_GRAY_AW_S5
+gray_signals -name top.R_PTR_GRAY_W_S5
+gray_signals -name top.W_PTR_GRAY_W_S5
+gray_signals -name top.R_PTR_GRAY_B_S5
+gray_signals -name top.W_PTR_GRAY_B_S5

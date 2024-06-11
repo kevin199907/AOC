@@ -1,0 +1,19 @@
+# Version:1.0 MMMC View Definition File
+# Do Not Remove Above Line
+create_rc_corner -name RC -cap_table {/usr/cad/CBDK/CBDK018_UMC_Faraday_v1.0/CIC/SOCE/u18_Faraday.CapTbl} -preRoute_res {1.0} -preRoute_cap {1.0} -preRoute_clkres {0.0} -preRoute_clkcap {0.0} -postRoute_res {1.0} -postRoute_cap {1.0} -postRoute_xcap {1.0} -postRoute_clkres {0.0} -postRoute_clkcap {0.0}
+
+create_library_set -name lib_max -timing {/usr/cad/CBDK/CBDK018_UMC_Faraday_v1.0/CIC/SOCE/lib/fsa0m_a_generic_core_ss1p62v125c.lib /usr/cad/CBDK/CBDK018_UMC_Faraday_v1.0/CIC/SOCE/lib/fsa0m_a_t33_generic_io_ss1p62v125c.lib ../sim/SRAM/SRAM_WC.lib ../sim/data_array/data_array_WC.lib ../sim/tag_array/tag_array_WC.lib} -si {/usr/cad/CBDK/CBDK018_UMC_Faraday_v1.0/CIC/SOCE/celtic/u18_ss.cdb}
+create_library_set -name lib_min -timing {/usr/cad/CBDK/CBDK018_UMC_Faraday_v1.0/CIC/SOCE/lib/fsa0m_a_generic_core_ff1p98vm40c.lib /usr/cad/CBDK/CBDK018_UMC_Faraday_v1.0/CIC/SOCE/lib/fsa0m_a_t33_generic_io_ff1p98vm40c.lib ../sim/SRAM/SRAM_BC.lib ../sim/data_array/data_array_BC.lib ../sim/tag_array/tag_array_BC.lib} -si {/usr/cad/CBDK/CBDK018_UMC_Faraday_v1.0/CIC/SOCE/celtic/u18_ff.cdb}
+create_library_set -name lib_typ -timing {/usr/cad/CBDK/CBDK018_UMC_Faraday_v1.0/CIC/SOCE/lib/fsa0m_a_generic_core_tt1p8v25c.lib /usr/cad/CBDK/CBDK018_UMC_Faraday_v1.0/CIC/SOCE/lib/fsa0m_a_t33_generic_io_tt1p8v25c.lib ../sim/SRAM/SRAM_TC.lib ../sim/data_array/data_array_TC.lib ../sim/tag_array/tag_array_TC.lib} -si {/usr/cad/CBDK/CBDK018_UMC_Faraday_v1.0/CIC/SOCE/celtic/u18_tt.cdb}
+
+create_constraint_mode -name CM -sdc_files {../script/APR.sdc}
+
+create_delay_corner -name DC_max -library_set {lib_max} -rc_corner {RC}
+create_delay_corner -name DC_min -library_set {lib_min} -rc_corner {RC}
+create_delay_corner -name DC_typ -library_set {lib_typ} -rc_corner {RC}
+
+create_analysis_view -name AV_max -constraint_mode {CM} -delay_corner {DC_max}
+create_analysis_view -name AV_min -constraint_mode {CM} -delay_corner {DC_min}
+create_analysis_view -name AV_typ -constraint_mode {CM} -delay_corner {DC_typ}
+
+set_analysis_view -setup {AV_max AV_typ} -hold {AV_min}

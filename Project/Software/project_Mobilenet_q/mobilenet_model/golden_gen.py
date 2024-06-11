@@ -157,3 +157,30 @@ def DecToBin_machine(num,accuracy):
     flocom = flo_list
     binary_value =  ''.join(flocom)
     return binary_value
+
+def input_weight_gen_with_0x(golden_layer_decimal):
+    '''Convert a layer output which is signed decimal in GPU to 8 bits hex with 2's complement in CPU and
+     make it 4 element in a line, example of use : golden_gen(q_output_activation["Conv.3"]) '''
+    golden = []
+    i=0
+    golden_in_numpy = golden_layer_decimal.cpu().numpy()
+    test = golden_in_numpy.flatten()
+    test =test.astype('int32')
+    golden.append([])
+    for j, data in enumerate(test):
+        if(j%4==0 ):
+            golden.append([])
+            i = i+1
+            golden[i].append(signed_dec2hex(data))
+        if(j%4!=0):
+            golden[i].append(signed_dec2hex(data))
+    golden.pop(0)
+    temp = '0x'
+    temp1 = ',\\'
+    for indice,data in enumerate(golden):
+        golden[indice].insert(0,temp)
+        golden[indice].append(temp1)
+
+    for indice,data in enumerate(golden):
+        print(*data,sep='')
+    return golden
