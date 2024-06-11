@@ -40,3 +40,5 @@ Network, Morgan and Claypool Publisher, 2020
 [Lab2](https://www.notion.so/Lab2-c8d20a4cd86d41d193e2ef987d6c54a6?pvs=21)
 
 [LAB3](https://www.notion.so/LAB3-06f1a2f6cf40443e9fc2572925373b3c?pvs=21)
+
+[LAB4](https://www.notion.so/Lab4-Processing-Element-df04c0b23ed348039eb5a41ac51d5015?pvs=4)
