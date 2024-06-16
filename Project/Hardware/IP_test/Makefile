@@ -122,6 +122,19 @@ vcs_mobile_block1_pw1: | $(bld_dir)
 	+prog_path=$(root_dir)/$(sim_dir)/prog_mobile_block1_pw1 \
 	+rdcycle=1
 
+vcs_mobile_block1_pw1: | $(bld_dir)
+	@if [ $$(echo $(CYCLE) '>' 20.0 | bc -l) -eq 1 ]; then \
+		echo "Cycle time shouldn't exceed 20"; \
+		exit 1; \
+	fi; \
+	make -C $(sim_dir)/prog_mobile_block1_pw1/; \
+	cd $(bld_dir); \
+	vcs -R -sverilog $(root_dir)/$(sim_dir)/top_tb.sv -debug_access+all -full64 \
+	+incdir+$(root_dir)/$(src_dir)+$(root_dir)/$(inc_dir)+$(root_dir)/$(sim_dir) \
+	+define+prog0$(FSDB_DEF) \
+	+prog_path=$(root_dir)/$(sim_dir)/prog_mobile_block1_pw1 \
+	+rdcycle=1
+	
 # Post-Synthesis simulation
 syn_all: clean syn0 syn1 syn2 syn3 syn4 syn5
 

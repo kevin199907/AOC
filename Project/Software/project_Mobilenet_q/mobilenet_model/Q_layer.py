@@ -173,7 +173,7 @@ class QuantizedConv(nn.Module):
     self.activation_bitwidth = activation_bitwidth
     self.q_bias = torch.round(bias / (input_scale*weight_scale))
     self.q_weight = weights - weight_zero_point
-    self.DeQ_scale = input_scale*weight_scale*8192
+    self.DeQ_scale = input_scale*weight_scale
   def forward(self, x):
     return quantized_conv(x, self.bias, self.weights, self.stride, self.padding, self.groups, self.input_scale, self.weight_scale, self.output_scale, self.input_zero_point, self.weight_zero_point, self.output_zero_point, device)
   def __repr__(self):

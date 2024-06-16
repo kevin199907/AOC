@@ -291,3 +291,72 @@ def customize_dw_input_gen(layer_decimal):
     print("byte3:",*byte3)
     print("=======")
     return byte0,byte1,byte2,byte3
+
+####### pw_ip_test #######
+
+def pw_ip_test_weight_bias_file_gen(weight,bias):
+    weight_byte0, weight_byte1, weight_byte2, weight_byte3 = input_or_weight_gen(weight)
+    bias_byte0, bias_byte1, bias_byte2, bias_byte3 = bias_gen(bias)
+    
+    f = open('data_and_golden/pw_ip_test/weight0.hex', 'w')
+    f.write("@00000000\n")
+    f.write("00"+"\n")
+    for i,data in enumerate(weight_byte0):
+        f.write(data+"\n")
+    ## bias
+    f.write("00"+"\n")
+    for i,data in enumerate(bias_byte0):
+        f.write(data+"\n")
+    f.write("@00100000\n")
+    f.write("100")
+    
+    f.close()
+    ##
+    f = open('data_and_golden/pw_ip_test/weight1.hex', 'w')
+    f.write("@00000000\n")
+    f.write("00"+"\n")
+    for i,data in enumerate(weight_byte1):
+        f.write(data+"\n")
+    ## bias
+    f.write("00"+"\n")
+    for i,data in enumerate(bias_byte1):
+        f.write(data+"\n")
+    f.write("@00100000\n")
+    f.write("100")
+    
+    f.close()
+    ##
+    f = open('data_and_golden/pw_ip_test/weight2.hex', 'w')
+    f.write("@00000000\n")
+    f.write("00"+"\n")
+    for i,data in enumerate(weight_byte2):
+        f.write(data+"\n")
+    ##bias
+    f.write("00"+"\n")
+    for i,data in enumerate(bias_byte2):
+        f.write(data+"\n")
+    f.write("@00100000\n")
+    f.write("100")
+    f.close()
+    ##
+    f = open('data_and_golden/pw_ip_test/weight3.hex', 'w')
+    f.write("@00000000\n")
+    f.write("F0"+"\n")
+    for i,data in enumerate(weight_byte3):
+        f.write(data+"\n")
+    ##bias
+    f.write("F0"+"\n")
+    for i,data in enumerate(bias_byte3):
+        f.write(data+"\n")
+    f.write("@00100000\n")
+    f.write("100")
+    f.close()
+
+def pw_ip_test_golden_file_gen(output):
+
+    golden = golden_gen(output)
+    f = open('data_and_golden/pw_ip_test/golden.hex', 'w')
+    for i,data in enumerate(golden):
+        print(*data,sep='',file=f)
+    f.close()
+########################
