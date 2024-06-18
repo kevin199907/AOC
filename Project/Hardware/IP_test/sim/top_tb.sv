@@ -23,7 +23,7 @@ module top_tb;
 
   logic clk;
   logic rst;
-  logic [31:0] GOLDEN[1024];
+  logic [31:0] GOLDEN[2048];
   integer gf, i, num;
   integer err;
   integer  cycle_err;

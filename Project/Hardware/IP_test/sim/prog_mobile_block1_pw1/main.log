@@ -342,7 +342,7 @@ Disassembly of section .text:
 
 00000084 <init_bss>:
   84:	00008517          	auipc	a0,0x8
-  88:	07c50513          	addi	a0,a0,124 # 8100 <__sbss_end>
+  88:	07c50513          	addi	a0,a0,124 # 8100 <__bss_end>
   8c:	00008597          	auipc	a1,0x8
   90:	07058593          	addi	a1,a1,112 # 80fc <_test_start+0xfc>
   94:	00000613          	li	a2,0
@@ -350,7 +350,7 @@ Disassembly of section .text:
 
 0000009c <init_sbss>:
   9c:	00008517          	auipc	a0,0x8
-  a0:	06450513          	addi	a0,a0,100 # 8100 <__sbss_end>
+  a0:	06450513          	addi	a0,a0,100 # 8100 <__bss_end>
   a4:	00008597          	auipc	a1,0x8
   a8:	05858593          	addi	a1,a1,88 # 80fc <_test_start+0xfc>
   ac:	00000613          	li	a2,0
@@ -358,7 +358,7 @@ Disassembly of section .text:
 
 000000b4 <write_stack_pattern>:
   b4:	00008517          	auipc	a0,0x8
-  b8:	04c50513          	addi	a0,a0,76 # 8100 <__sbss_end>
+  b8:	04c50513          	addi	a0,a0,76 # 8100 <__bss_end>
   bc:	00009597          	auipc	a1,0x9
   c0:	04058593          	addi	a1,a1,64 # 90fc <_gp+0x7fc>
   c4:	00000613          	li	a2,0
@@ -389,7 +389,7 @@ Disassembly of section .text:
  100:	0000006f          	j	100 <dead_loop>
 
 00000104 <fill_block>:
- 104:	00b57863          	bleu	a1,a0,114 <fb_end>
+ 104:	00b57863          	bgeu	a0,a1,114 <fb_end>
  108:	00c52023          	sw	a2,0(a0)
  10c:	00450513          	addi	a0,a0,4
  110:	ff5ff06f          	j	104 <fill_block>
@@ -1032,31 +1032,31 @@ Disassembly of section .text:
  a04:	fffff2b7          	lui	t0,0xfffff
  a08:	fffff337          	lui	t1,0xfffff
  a0c:	00428313          	addi	t1,t0,4 # fffff004 <_end+0xfffef004>
- a10:	0262da63          	ble	t1,t0,a44 <bge+0x40>
- a14:	0262d863          	ble	t1,t0,a44 <bge+0x40>
- a18:	0262d663          	ble	t1,t0,a44 <bge+0x40>
- a1c:	0262d463          	ble	t1,t0,a44 <bge+0x40>
- a20:	0262d263          	ble	t1,t0,a44 <bge+0x40>
+ a10:	0262da63          	bge	t0,t1,a44 <bge+0x40>
+ a14:	0262d863          	bge	t0,t1,a44 <bge+0x40>
+ a18:	0262d663          	bge	t0,t1,a44 <bge+0x40>
+ a1c:	0262d463          	bge	t0,t1,a44 <bge+0x40>
+ a20:	0262d263          	bge	t0,t1,a44 <bge+0x40>
  a24:	ffff0337          	lui	t1,0xffff0
  a28:	ffc28313          	addi	t1,t0,-4
- a2c:	00535c63          	ble	t0,t1,a44 <bge+0x40>
- a30:	00535a63          	ble	t0,t1,a44 <bge+0x40>
- a34:	00535863          	ble	t0,t1,a44 <bge+0x40>
- a38:	00535663          	ble	t0,t1,a44 <bge+0x40>
- a3c:	00535463          	ble	t0,t1,a44 <bge+0x40>
+ a2c:	00535c63          	bge	t1,t0,a44 <bge+0x40>
+ a30:	00535a63          	bge	t1,t0,a44 <bge+0x40>
+ a34:	00535863          	bge	t1,t0,a44 <bge+0x40>
+ a38:	00535663          	bge	t1,t0,a44 <bge+0x40>
+ a3c:	00535463          	bge	t1,t0,a44 <bge+0x40>
  a40:	0080006f          	j	a48 <bge+0x44>
  a44:	0012e293          	ori	t0,t0,1
  a48:	00001337          	lui	t1,0x1
  a4c:	fff30313          	addi	t1,t1,-1 # fff <__rodata_end+0x3db>
- a50:	0062d463          	ble	t1,t0,a58 <bge+0x54>
+ a50:	0062d463          	bge	t0,t1,a58 <bge+0x54>
  a54:	0080006f          	j	a5c <bge+0x58>
  a58:	0022e293          	ori	t0,t0,2
  a5c:	00028313          	mv	t1,t0
- a60:	0062d463          	ble	t1,t0,a68 <bge+0x64>
+ a60:	0062d463          	bge	t0,t1,a68 <bge+0x64>
  a64:	0042e293          	ori	t0,t0,4
  a68:	fffff337          	lui	t1,0xfffff
  a6c:	eee30313          	addi	t1,t1,-274 # ffffeeee <_end+0xfffeeeee>
- a70:	0062d463          	ble	t1,t0,a78 <bge+0x74>
+ a70:	0062d463          	bge	t0,t1,a78 <bge+0x74>
  a74:	0082e293          	ori	t0,t0,8
  a78:	00542023          	sw	t0,0(s0)
  a7c:	00440413          	addi	s0,s0,4
@@ -1098,31 +1098,31 @@ Disassembly of section .text:
  afc:	fffff2b7          	lui	t0,0xfffff
  b00:	fffff337          	lui	t1,0xfffff
  b04:	00428313          	addi	t1,t0,4 # fffff004 <_end+0xfffef004>
- b08:	0262fc63          	bleu	t1,t0,b40 <bgeu+0x44>
- b0c:	0262fa63          	bleu	t1,t0,b40 <bgeu+0x44>
- b10:	0262f863          	bleu	t1,t0,b40 <bgeu+0x44>
- b14:	0262f663          	bleu	t1,t0,b40 <bgeu+0x44>
- b18:	0262f463          	bleu	t1,t0,b40 <bgeu+0x44>
+ b08:	0262fc63          	bgeu	t0,t1,b40 <bgeu+0x44>
+ b0c:	0262fa63          	bgeu	t0,t1,b40 <bgeu+0x44>
+ b10:	0262f863          	bgeu	t0,t1,b40 <bgeu+0x44>
+ b14:	0262f663          	bgeu	t0,t1,b40 <bgeu+0x44>
+ b18:	0262f463          	bgeu	t0,t1,b40 <bgeu+0x44>
  b1c:	00001337          	lui	t1,0x1
  b20:	fff30313          	addi	t1,t1,-1 # fff <__rodata_end+0x3db>
  b24:	ffc28313          	addi	t1,t0,-4
- b28:	00537c63          	bleu	t0,t1,b40 <bgeu+0x44>
- b2c:	00537a63          	bleu	t0,t1,b40 <bgeu+0x44>
- b30:	00537863          	bleu	t0,t1,b40 <bgeu+0x44>
- b34:	00537663          	bleu	t0,t1,b40 <bgeu+0x44>
- b38:	00537463          	bleu	t0,t1,b40 <bgeu+0x44>
+ b28:	00537c63          	bgeu	t1,t0,b40 <bgeu+0x44>
+ b2c:	00537a63          	bgeu	t1,t0,b40 <bgeu+0x44>
+ b30:	00537863          	bgeu	t1,t0,b40 <bgeu+0x44>
+ b34:	00537663          	bgeu	t1,t0,b40 <bgeu+0x44>
+ b38:	00537463          	bgeu	t1,t0,b40 <bgeu+0x44>
  b3c:	0080006f          	j	b44 <bgeu+0x48>
  b40:	0012e293          	ori	t0,t0,1
  b44:	fff00313          	li	t1,-1
- b48:	0062f463          	bleu	t1,t0,b50 <bgeu+0x54>
+ b48:	0062f463          	bgeu	t0,t1,b50 <bgeu+0x54>
  b4c:	0080006f          	j	b54 <bgeu+0x58>
  b50:	0022e293          	ori	t0,t0,2
  b54:	00028313          	mv	t1,t0
- b58:	0062f463          	bleu	t1,t0,b60 <bgeu+0x64>
+ b58:	0062f463          	bgeu	t0,t1,b60 <bgeu+0x64>
  b5c:	0042e293          	ori	t0,t0,4
  b60:	00001337          	lui	t1,0x1
  b64:	fff30313          	addi	t1,t1,-1 # fff <__rodata_end+0x3db>
- b68:	0062f463          	bleu	t1,t0,b70 <bgeu+0x74>
+ b68:	0062f463          	bgeu	t0,t1,b70 <bgeu+0x74>
  b6c:	0082e293          	ori	t0,t0,8
  b70:	00542023          	sw	t0,0(s0)
  b74:	00440413          	addi	s0,s0,4
